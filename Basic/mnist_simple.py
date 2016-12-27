@@ -30,11 +30,37 @@ network = tl.layers.DenseLayer(network, n_units=800,act = tf.nn.relu, name='dens
 #print(network.all_drop) # {<tf.Tensor 'Placeholder:0' shape=<unknown> dtype=float32>: 0.8}
 
 network = tl.layers.DropoutLayer(network, keep=0.5, name='dropout_layer_2')
+#print(type(network)) # <class 'tensorlayer.layers.DropoutLayer'>
 
 network = tl.layers.DenseLayer(network, n_units=800,act = tf.nn.relu, name='dense_relu_2')
+#print(type(network)) # <class 'tensorlayer.layers.DenseLayer'>
 
 network = tl.layers.DropoutLayer(network, keep=0.5, name='dropout_layer_3')
+#print(type(network)) # <class 'tensorlayer.layers.DropoutLayer'>
 
 network = tl.layers.DenseLayer(network, n_units=10, act = tf.identity, name='output_layer')
+#print(type(network)) # <class 'tensorlayer.layers.DenseLayer'>
+
+predict_label = network.outputs
+#print(type(predict_label)) # <class 'tensorflow.python.framework.ops.Tensor'>
+
+#print(predict_label._shape) # (?, 10)
+#print(input_label._shape) # (?,)
+cost = tl.cost.cross_entropy(predict_label, input_label) 
+#print(type(cost)) # <class 'tensorflow.python.framework.ops.Tensor'>
+
+train_params = network.all_params
+#print(train_params)#[<tensorflow.python.ops.variables.Variable object at 0x7f98d9396080>, <tensorflow.python.ops.variables.Variable object at 0x7f98d9396208>, <tensorflow.python.ops.variables.Variable object at 0x7f98d9396780>, <tensorflow.python.ops.variables.Variable object at 0x7f98d8336c50>, <tensorflow.python.ops.variables.Variable object at 0x7f98d9376518>, <tensorflow.python.ops.variables.Variable object at 0x7f98d83559b0>]
+train_op = tf.train.AdamOptimizer(0.0001).minimize(cost, var_list=train_params)
+
+correct = tf.equal(tf.argmax(predict_label, 1), input_label)
+accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
+
+sess.run(tf.initialize_all_variables())
+
+network.print_params()
+network.print_layers()
+
+
 
 sess.close()
