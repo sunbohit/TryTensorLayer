@@ -51,7 +51,7 @@ cost = tl.cost.cross_entropy(predict_label, input_label)
 
 train_params = network.all_params
 #print(train_params)#[<tensorflow.python.ops.variables.Variable object at 0x7f98d9396080>, <tensorflow.python.ops.variables.Variable object at 0x7f98d9396208>, <tensorflow.python.ops.variables.Variable object at 0x7f98d9396780>, <tensorflow.python.ops.variables.Variable object at 0x7f98d8336c50>, <tensorflow.python.ops.variables.Variable object at 0x7f98d9376518>, <tensorflow.python.ops.variables.Variable object at 0x7f98d83559b0>]
-train_op = tf.train.AdamOptimizer(0.0001).minimize(cost, var_list=train_params)
+optimizer = tf.train.AdamOptimizer(0.0001).minimize(cost, var_list=train_params)
 
 correct = tf.equal(tf.argmax(predict_label, 1), input_label)
 accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
@@ -61,6 +61,12 @@ sess.run(tf.initialize_all_variables())
 network.print_params()
 network.print_layers()
 
+tl.utils.fit(sess, network, optimizer, cost, feat_train, lab_train, input_feature, input_label,
+            acc=accuracy, batch_size=500, n_epoch=500, print_freq=5,
+            X_val=feat_valid, y_val=lab_valid, eval_train=True)
 
+tl.utils.test(sess, network, accuracy, feat_test, lab_test, input_feature, input_label, batch_size=None, cost=cost)
+
+tl.files.save_npz(network.all_params , name='model.npz')
 
 sess.close()
